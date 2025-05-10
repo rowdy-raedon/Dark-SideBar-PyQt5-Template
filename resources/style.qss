@@ -1,0 +1,164 @@
+/* Global Styles */
+QMainWindow, QWidget {
+    background-color: #121212;
+    color: #FFFFFF;
+    font-family: "Segoe UI", Arial;
+    font-size: 11px;
+}
+
+/* Custom Title Bar */
+#titleBar {
+    background-color: rgba(31, 31, 31, 0.8);
+    border-bottom: 1px solid rgba(45, 45, 45, 0.8);
+    min-height: 24px;
+    max-height: 24px;
+}
+
+#titleBar QLabel {
+    color: #FFFFFF;
+}
+
+/* Window Control Buttons */
+#minimizeBtn, #maximizeBtn, #closeBtn {
+    background-color: transparent;
+    border: none;
+    padding: 2px;
+    min-width: 24px;
+    max-width: 24px;
+    min-height: 24px;
+    max-height: 24px;
+}
+
+#minimizeBtn:hover, #maximizeBtn:hover {
+    background-color: rgba(45, 45, 45, 0.8);
+}
+
+#closeBtn:hover {
+    background-color: rgba(196, 43, 28, 0.8);
+}
+
+/* Sidebar */
+#sidebar {
+    background-color: rgba(31, 31, 31, 0.8);
+    border: none;
+    min-width: 36px;
+    max-width: 36px;
+}
+
+#sidebar QPushButton {
+    background-color: transparent;
+    border: none;
+    border-radius: 3px;
+    padding: 4px;
+    margin: 2px;
+    icon-size: 18px;
+}
+
+#sidebar QPushButton:hover {
+    background-color: rgba(45, 45, 45, 0.3);
+}
+
+#sidebar QPushButton:checked {
+    background-color: rgba(0, 120, 215, 0.3);
+}
+
+/* Content Area */
+#contentArea {
+    background-color: #121212;
+    border: none;
+}
+
+/* Generic Widget Styles */
+QPushButton {
+    background-color: rgba(0, 120, 215, 0.8);
+    border: none;
+    border-radius: 3px;
+    padding: 4px 8px;
+    color: white;
+}
+
+QPushButton:hover {
+    background-color: rgba(16, 132, 226, 0.8);
+}
+
+QPushButton:pressed {
+    background-color: rgba(0, 108, 193, 0.8);
+}
+
+QLineEdit, QComboBox {
+    background: transparent;
+    border: 1px solid rgba(45, 45, 45, 0.8);
+    border-radius: 3px;
+    padding: 3px;
+    color: white;
+}
+
+QLineEdit:focus {
+    border: 1px solid rgba(0, 120, 215, 0.8);
+}
+
+QComboBox:drop-down {
+    border: none;
+}
+
+QComboBox:down-arrow {
+    image: url(resources/icons/dropdown.svg);
+}
+
+/* Scrollbar Styling */
+QScrollBar:vertical, QScrollBar:horizontal {
+    background-color: transparent;
+    width: 8px;
+    height: 8px;
+}
+
+QScrollBar::handle:vertical, QScrollBar::handle:horizontal {
+    background-color: rgba(45, 45, 45, 0.5);
+    border-radius: 4px;
+}
+
+QScrollBar::add-line, QScrollBar::sub-line {
+    height: 0px;
+    width: 0px;
+}
+
+/* Welcome Frame */
+#welcomeFrame {
+    background: transparent;
+    padding: 8px;
+}
+
+/* Action Cards */
+#actionCard {
+    background-color: rgba(31, 31, 31, 0.8);
+    border-radius: 4px;
+    padding: 8px;
+    min-width: 200px;
+}
+
+#actionCard:hover {
+    background-color: rgba(45, 45, 45, 0.8);
+}
+
+#actionCard QPushButton {
+    margin-top: 8px;
+}
+
+/* Stat Cards */
+#statCard {
+    background: transparent;
+    padding: 8px;
+    min-width: 150px;
+}
+
+/* Content Cards */
+#contentCard {
+    background: transparent;
+    padding: 8px;
+}
+
+/* Settings Container */
+#settingsContainer {
+    background: transparent;
+    padding: 8px;
+} 
