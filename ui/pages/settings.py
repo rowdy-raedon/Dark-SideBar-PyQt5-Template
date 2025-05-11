@@ -1,5 +1,6 @@
 from PyQt5.QtWidgets import (QWidget, QVBoxLayout, QHBoxLayout, QLabel,
-                             QCheckBox, QFrame, QComboBox, QPushButton, QScrollArea)
+                             QCheckBox, QFrame, QComboBox, QPushButton, QScrollArea,
+                             QSpinBox, QLineEdit)
 from PyQt5.QtCore import Qt, pyqtSignal, QPropertyAnimation, QEasingCurve, QRectF
 from PyQt5.QtGui import QPainter, QColor, QPainterPath
 
@@ -70,15 +71,36 @@ class SettingsSection(QFrame):
 class SettingsPage(QWidget):
     """Settings page with customizable options."""
     
-    # Signals
+    # Signals for settings changes
     themeChanged = pyqtSignal(bool)
     fontSizeChanged = pyqtSignal(str)
     notificationsChanged = pyqtSignal(bool)
+    languageChanged = pyqtSignal(str)
+    autoSaveChanged = pyqtSignal(int)
+    apiKeyChanged = pyqtSignal(str)
+    customThemeChanged = pyqtSignal(str)
     
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setup_ui()
     
+    def create_setting_row(self, label_text, widget):
+        """Helper method to create a consistent setting row layout."""
+        container = QWidget()
+        layout = QHBoxLayout(container)
+        layout.setContentsMargins(0, 0, 0, 0)
+        
+        label = QLabel(label_text)
+        label.setStyleSheet("""
+            background-color: rgba(31, 31, 31, 0.8);
+            border-radius: 4px;
+            padding: 4px;
+        """)
+        layout.addWidget(label)
+        layout.addWidget(widget)
+        
+        return container
+
     def setup_ui(self):
         """Initialize the settings UI components."""
         # Main layout with scroll area
@@ -108,77 +130,133 @@ class SettingsPage(QWidget):
         """)
         content_layout.addWidget(header)
         
-        # Appearance section
+        # SECTION 1: Appearance
         appearance_section = SettingsSection("Appearance")
         
         # Theme toggle
-        theme_container = QWidget()
-        theme_layout = QHBoxLayout(theme_container)
-        theme_layout.setContentsMargins(0, 0, 0, 0)
-        
-        theme_label = QLabel("Dark Theme")
-        theme_label.setStyleSheet("""
-            background-color: rgba(31, 31, 31, 0.8);
-            border-radius: 4px;
-            padding: 4px;
-        """)
-        theme_layout.addWidget(theme_label)
-        
         self.theme_toggle = QCheckBox()
         self.theme_toggle.setChecked(True)
         self.theme_toggle.stateChanged.connect(lambda state: self.themeChanged.emit(bool(state)))
-        theme_layout.addWidget(self.theme_toggle)
-        
-        appearance_section.content_layout.addWidget(theme_container)
+        appearance_section.content_layout.addWidget(
+            self.create_setting_row("Dark Theme", self.theme_toggle)
+        )
         
         # Font size selector
-        font_container = QWidget()
-        font_layout = QHBoxLayout(font_container)
-        font_layout.setContentsMargins(0, 0, 0, 0)
-        
-        font_label = QLabel("Font Size")
-        font_label.setStyleSheet("""
-            background-color: rgba(31, 31, 31, 0.8);
-            border-radius: 4px;
-            padding: 4px;
-        """)
-        font_layout.addWidget(font_label)
-        
         self.font_size_combo = QComboBox()
         self.font_size_combo.addItems(["Small", "Medium", "Large"])
         self.font_size_combo.setCurrentText("Medium")
         self.font_size_combo.currentTextChanged.connect(self.fontSizeChanged)
-        font_layout.addWidget(self.font_size_combo)
+        appearance_section.content_layout.addWidget(
+            self.create_setting_row("Font Size", self.font_size_combo)
+        )
         
-        appearance_section.content_layout.addWidget(font_container)
+        # Language selector
+        self.language_combo = QComboBox()
+        self.language_combo.addItems(["English", "Spanish", "French", "German", "Chinese"])
+        self.language_combo.currentTextChanged.connect(self.languageChanged)
+        appearance_section.content_layout.addWidget(
+            self.create_setting_row("Language", self.language_combo)
+        )
+        
         content_layout.addWidget(appearance_section)
         
-        # Notifications section
-        notifications_section = SettingsSection("Notifications")
+        # SECTION 2: User Preferences
+        preferences_section = SettingsSection("User Preferences")
         
-        # Enable notifications toggle
-        notifications_container = QWidget()
-        notifications_layout = QHBoxLayout(notifications_container)
-        notifications_layout.setContentsMargins(0, 0, 0, 0)
+        # Auto-save interval
+        self.auto_save_spin = QSpinBox()
+        self.auto_save_spin.setRange(1, 60)
+        self.auto_save_spin.setValue(5)
+        self.auto_save_spin.setSuffix(" minutes")
+        self.auto_save_spin.valueChanged.connect(self.autoSaveChanged)
+        preferences_section.content_layout.addWidget(
+            self.create_setting_row("Auto-save Interval", self.auto_save_spin)
+        )
         
-        notifications_label = QLabel("Enable Notifications")
-        notifications_label.setStyleSheet("""
-            background-color: rgba(31, 31, 31, 0.8);
-            border-radius: 4px;
-            padding: 4px;
-        """)
-        notifications_layout.addWidget(notifications_label)
-        
+        # Notifications toggle
         self.notifications_toggle = QCheckBox()
         self.notifications_toggle.setChecked(True)
         self.notifications_toggle.stateChanged.connect(lambda state: self.notificationsChanged.emit(bool(state)))
-        notifications_layout.addWidget(self.notifications_toggle)
+        preferences_section.content_layout.addWidget(
+            self.create_setting_row("Enable Notifications", self.notifications_toggle)
+        )
         
-        notifications_section.content_layout.addWidget(notifications_container)
-        content_layout.addWidget(notifications_section)
+        content_layout.addWidget(preferences_section)
+        
+        # SECTION 3: Advanced Settings
+        advanced_section = SettingsSection("Advanced Settings")
+        
+        # API Key input
+        self.api_key_input = QLineEdit()
+        self.api_key_input.setPlaceholderText("Enter your API key")
+        self.api_key_input.textChanged.connect(self.apiKeyChanged)
+        advanced_section.content_layout.addWidget(
+            self.create_setting_row("API Key", self.api_key_input)
+        )
+        
+        # Debug mode
+        self.debug_mode = QCheckBox()
+        advanced_section.content_layout.addWidget(
+            self.create_setting_row("Debug Mode", self.debug_mode)
+        )
+        
+        content_layout.addWidget(advanced_section)
+        
+        # SECTION 4: Custom Themes
+        themes_section = SettingsSection("Custom Themes")
+        
+        # Theme selector
+        self.custom_theme_combo = QComboBox()
+        self.custom_theme_combo.addItems([
+            "Default Dark",
+            "Monokai",
+            "Solarized Dark",
+            "Nord",
+            "Dracula"
+        ])
+        self.custom_theme_combo.currentTextChanged.connect(self.customThemeChanged)
+        themes_section.content_layout.addWidget(
+            self.create_setting_row("Theme Preset", self.custom_theme_combo)
+        )
+        
+        # Accent color
+        self.accent_color_combo = QComboBox()
+        self.accent_color_combo.addItems([
+            "Blue",
+            "Green",
+            "Purple",
+            "Orange",
+            "Pink"
+        ])
+        themes_section.content_layout.addWidget(
+            self.create_setting_row("Accent Color", self.accent_color_combo)
+        )
+        
+        content_layout.addWidget(themes_section)
         
         # Add stretch to push sections to top
         content_layout.addStretch()
+        
+        # Add save button
+        self.save_button = QPushButton("Save Settings")
+        self.save_button.clicked.connect(self.save_settings)
+        self.save_button.setStyleSheet("""
+            QPushButton {
+                background-color: #0078D7;
+                border: none;
+                border-radius: 4px;
+                padding: 8px 16px;
+                color: white;
+                font-weight: bold;
+            }
+            QPushButton:hover {
+                background-color: #1084E2;
+            }
+            QPushButton:pressed {
+                background-color: #006CC1;
+            }
+        """)
+        content_layout.addWidget(self.save_button)
         
         # Set scroll area widget
         scroll_area.setWidget(content_widget)
@@ -198,4 +276,23 @@ class SettingsPage(QWidget):
     def save_settings(self):
         """Save the current settings."""
         # TODO: Implement settings persistence
+        # Example implementation structure:
+        settings = {
+            'theme': {
+                'dark_mode': self.theme_toggle.isChecked(),
+                'font_size': self.font_size_combo.currentText(),
+                'language': self.language_combo.currentText(),
+                'custom_theme': self.custom_theme_combo.currentText(),
+                'accent_color': self.accent_color_combo.currentText()
+            },
+            'preferences': {
+                'auto_save_interval': self.auto_save_spin.value(),
+                'notifications_enabled': self.notifications_toggle.isChecked()
+            },
+            'advanced': {
+                'api_key': self.api_key_input.text(),
+                'debug_mode': self.debug_mode.isChecked()
+            }
+        }
+        # TODO: Save settings to file/database
         pass 
